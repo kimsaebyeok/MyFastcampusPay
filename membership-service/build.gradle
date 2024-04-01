@@ -7,6 +7,7 @@ buildscript {
 plugins {
     id 'org.springframework.boot' version '2.5.2'
     id 'java'
+    id 'com.palantir.docker' version '0.25.0'
 }
 
 compileJava {
@@ -48,4 +49,20 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+docker {
+    println(tasks.bootJar.outputs.files)
+
+    //이미지 이름
+    name rootProject.name.toLowerCase()+'-'+project.name+":"+version
+
+    //어떤 dockerfile
+    dockerfile file('./Dockerfile')
+
+    //어떤 파일들을 dockerfile에 복사할 것인가
+    files tasks.bootJar.outputs.files
+
+    //dockerfile에 전달할 인자
+    buildArgs(['JAR_FILE': tasks.bootJar.outputs.files.singleFile.name])
 }
